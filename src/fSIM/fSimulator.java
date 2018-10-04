@@ -6,6 +6,11 @@ public class fSimulator {
 
 	public static void main(String[] args) {
 		
+		//creating a class that reads Excel files
+		ExcelReader eR = new ExcelReader();
+		
+		
+		
 		//yields
 		//growth yields
 		
