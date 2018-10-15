@@ -9,7 +9,7 @@ public class fSimulator {
 		//creating a class that reads Excel files
 		ExcelReader eR = new ExcelReader();
 		
-		
+		//eR.staticYieldCreation("InputFiles/FCYields.xlsx");
 		
 		//yields
 		//growth yields
@@ -17,7 +17,7 @@ public class fSimulator {
 		//array list of all yields, likely to go into a 'Matching' class eventually
 		ArrayList<GrowthYield> yYields = new ArrayList<GrowthYield>();
 		
-		GrowthYield gY = new GrowthYield("SS", 16, "thin"); //add if statement here when reading rows from table to only create a new growth yield object if it hasn't been invented yet
+		GrowthYield gY = new GrowthYield("SS", "16", "thin"); //add if statement here when reading rows from table to only create a new growth yield object if it hasn't been invented yet
 		yYields.add(gY);
 		
 		//creating dummy yield data for ss yc 16

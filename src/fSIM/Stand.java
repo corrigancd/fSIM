@@ -6,7 +6,7 @@ public class Stand {
 	private double area;
 	private int age;
 	private String thin;
-	
+
 	public Stand(String s, int p, double a, int age) {
 		this.species = s;
 		this.productivity = p;
@@ -22,11 +22,11 @@ public class Stand {
 	public void setAge(int age) {
 		this.age = age;
 	}
-	
+
 	public String getStandIdentifier() {
 		return species + productivity + thin;
 	}
-	
+
 	// area calculation for stand level reporting
 	public double calcTotStand(int a) {
 		return (this.area * a);
@@ -34,7 +34,7 @@ public class Stand {
 	public double calcTotStand(double a) {
 		return (this.area * a);
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Stand [species=" + species + ", productivity=" + productivity + ", area=" + area + ", age=" + age + "]";
@@ -63,5 +63,5 @@ public class Stand {
 	public void setSpecies(String species) {
 		this.species = species;
 	}
-	
+
 }

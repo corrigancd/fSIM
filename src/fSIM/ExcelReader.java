@@ -1,7 +1,7 @@
 package fSIM;
 
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -9,112 +9,147 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;	
-import java.io.IOException;	
-import java.util.Iterator;	
-	
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;	
 
 
 public class ExcelReader {
 
-    private static final String FILE_PATH = "InputFiles/FCYields.xlsx";
+	public static void main(String[] args) {
 
-    
-    public static void main(String args[]) {
-    	int count = 0;
-        FileInputStream fis = null;
+		ArrayList<GrowthYield> yYields = new ArrayList<GrowthYield>(); // yYields created based on IDs
+		LinkedList<String> growthMetricNames = new LinkedList<String>(); // metric names for growth metric object creation
+		int yieldBeginIndex = 19; // add into method argument when this becomes the case
+		int ageColumnIndex = 18;
 
-        try {
+		// public void staticYieldCreation(String path) {
+		int count = 0;
+		FileInputStream fis = null;
 
-            fis = new FileInputStream(FILE_PATH);
 
-            // Using XSSF for xlsx format, for xls use HSSF
-            Workbook workbook = new XSSFWorkbook(fis);
+		try {
 
-            int numberOfSheets = workbook.getNumberOfSheets();
+			fis = new FileInputStream("InputFiles/FCYields.xlsx");
+			// Using XSSF for xlsx format, for xls use HSSF
+			Workbook workbook = new XSSFWorkbook(fis);
 
-            //looping over each workbook sheet
+			DataFormatter df = new DataFormatter(); //data formatter object to turn all cell values into string
 
-            for (int i = 0; i < numberOfSheets; i++) {
-            	
-                Sheet sheet = workbook.getSheetAt(i);
-                
-                Iterator<Row> rowIterator = sheet.iterator();
+			//0 is the index of the first excel worksheet
+			Sheet sheet = workbook.getSheetAt(0);
 
-                //iterating over each row
-                while (rowIterator.hasNext()) {
+			Iterator<Row> rowIterator = sheet.iterator();
 
-                	 // will need to create growth yield and growth metric objects here instead of Student used in example
-                     // Student student = new Student();
+			String previousRowYieldID = "temp"; // temp variable for creating yield key, note, the yield table must be ordered input table.
+			//iterating over each row
+			while (rowIterator.hasNext()) {
 
-                    Row row = rowIterator.next();
+				Row row = rowIterator.next();
+				Iterator<Cell> cellIterator = row.cellIterator();
+				count = count + 1;
 
-                    Iterator<Cell> cellIterator = row.cellIterator();
-                    count = count + 1;
-                    
-                    //Iterating over each cell (column wise)  in a particular row.
-                    while (cellIterator.hasNext()) {
+				if (row.getRowNum() == 0) { // get all growth metrics and perhaps create growth metrics?
+					while (cellIterator.hasNext()) {
+						Cell cell = cellIterator.next();
 
-                         Cell cell = cellIterator.next();
+						if (cell.getColumnIndex() >= yieldBeginIndex) {
+							growthMetricNames.add(cell.getStringCellValue());	
+						} 
+					}	
+				}
 
-                        //The Cell Containing String will is name.
+				if (row.getRowNum() >= 1) { // iterating over each data row, if the yield ID has changed, create a new 
+					String species = null;
+					String productivity = null;
+					String thinStatus = null;	
 
-                        if (CellType.STRING == cell.getCellType()) {
+					//Create yield key of the current row
+					String currentRowYieldID = null;
+					int age = 0; //create age at that point of iteration for later object creation
+					boolean createAge = true;
+					
+					while (cellIterator.hasNext()) {
 
-                        	System.out.println("getting cell type");
-                            //student.setName(cell.getStringCellValue());
+						Cell cell = cellIterator.next();
 
-                            //The Cell Containing numeric value will contain marks
+						if (cell.getColumnIndex() == 1) {
+							productivity = df.formatCellValue(cell);	            			
+						}
+						if (cell.getColumnIndex() == 0) {	            			
+							species = df.formatCellValue(cell);	            			
+						}
+						if (cell.getColumnIndex() == 8) {
 
-                        } else if (CellType.NUMERIC == cell.getCellType()) {
+							//for now assumes that a question mark is a thinning yield
+							if (df.formatCellValue(cell).contains("?")) {
+								thinStatus = "thin";
+							} else { 
+								thinStatus = df.formatCellValue(cell);
+							}
+						}
 
-                            //Cell with index 1 contains marks in Maths
+						//new yield ID based on iterating the criteria up to the age column of yield table
+						if (cell.getColumnIndex() == ageColumnIndex) { // potentially have == instead of >= after this is working
+							currentRowYieldID = species + productivity + thinStatus;
+							age = (int) cell.getNumericCellValue();
+						}
 
-                            //if (cell.getColumnIndex() == columnIndex) {
-                            if (cell.getColumnIndex() == 19) {
+						//if previous and current ids don't match, create a new growth yield
+						if ((cell.getColumnIndex() >= yieldBeginIndex)) {
+							if (!previousRowYieldID.equals(currentRowYieldID)) { //ids are not equal, create a new growth yield
 
-                            	//System.out.println("getting index 1");
-                            	
-                            	System.out.println(String.valueOf(cell.getNumericCellValue()));
-                            }
+								yYields.add(new GrowthYield(species, productivity, thinStatus)); //creating a new growth yield object
 
-                            //Cell with index 2 contains marks in Science
+								if (createAge == true) {
+									yYields.get(yYields.size()-1).addGrowthAge(new GrowthAge(age));
+									createAge = false;
+								}
 
-                            else if (cell.getColumnIndex() == 2) {
+								double dNum = Double.parseDouble(df.formatCellValue(cell));
+								String metricName = growthMetricNames.get(cell.getColumnIndex() - yieldBeginIndex);
+								
+															
+								yYields.get(yYields.size()-1).createUpdateMetricValue(dNum, metricName);
 
-                            	System.out.println("getting index 2");
-                                //student.setScience(String.valueOf(cell.getNumericCellValue()));
-                            }
+								previousRowYieldID = currentRowYieldID; // current yield ID
 
-                            //Cell with index 3 contains marks in English
+							} else if (previousRowYieldID.equals(currentRowYieldID)){ // id's are equal, don't create new growth yield
 
-                            else if (cell.getColumnIndex() == 3) {
-                            	
-                            	System.out.println("getting index 3");
-                            	
-                               // student.setEnglish(String.valueOf(cell.getNumericCellValue()));	
-                            }	
-                        }	
-                    }
+								if (createAge == true) {
+									yYields.get(yYields.size()-1).addGrowthAge(new GrowthAge(age));
+									createAge = false;
+								}
 
-                    //end iterating a row, add all the elements of a row in list
-                    //studentList.add(student);
-                    System.out.println("add info from row to structures here");
-                }
-            }
+								double dNum = Double.parseDouble(df.formatCellValue(cell));
+								String metricName = growthMetricNames.get(cell.getColumnIndex() - yieldBeginIndex);
+								
+								yYields.get(yYields.size()-1).createUpdateMetricValue(dNum, metricName);
+								
+								//System.out.println(previousRowYieldID + " " + growthMetricNames.get(cell.getColumnIndex() - yieldBeginIndex) + " " + cell.getColumnIndex() + " " + df.formatCellValue(cell));
+								
+							}
+						}
+					}		
+				} 		
+			} // close row iteration
+			
+			fis.close();
+			workbook.close();
 
-            fis.close();
-            workbook.close();
+		}catch (FileNotFoundException e) {
+			e.printStackTrace();
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println("Total rows: " + count);
-        //return studentList;
-    }
-}
+		for (GrowthYield s: yYields) {
+			s.printMetricNames();
+		}
 
-	
+		System.out.println("There are: " + yYields.size() + " yields and should be 80");
+	}
 
+} // close class
