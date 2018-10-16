@@ -17,7 +17,7 @@ import java.util.LinkedList;
 
 public class ExcelReader {
 
-	public static void main(String[] args) {
+	public void staticYieldCreation(String path, int sheetNumber) {
 
 		ArrayList<GrowthYield> yYields = new ArrayList<GrowthYield>(); // yYields created based on IDs
 		LinkedList<String> growthMetricNames = new LinkedList<String>(); // metric names for growth metric object creation
@@ -28,17 +28,16 @@ public class ExcelReader {
 		int count = 0;
 		FileInputStream fis = null;
 
-
 		try {
 
-			fis = new FileInputStream("InputFiles/FCYields.xlsx");
+			fis = new FileInputStream(path);
 			// Using XSSF for xlsx format, for xls use HSSF
 			Workbook workbook = new XSSFWorkbook(fis);
 
 			DataFormatter df = new DataFormatter(); //data formatter object to turn all cell values into string
 
 			//0 is the index of the first excel worksheet
-			Sheet sheet = workbook.getSheetAt(0);
+			Sheet sheet = workbook.getSheetAt(sheetNumber);
 
 			Iterator<Row> rowIterator = sheet.iterator();
 
@@ -69,7 +68,7 @@ public class ExcelReader {
 					String currentRowYieldID = null;
 					int age = 0; //create age at that point of iteration for later object creation
 					boolean createAge = true;
-					
+
 					while (cellIterator.hasNext()) {
 
 						Cell cell = cellIterator.next();
@@ -108,9 +107,7 @@ public class ExcelReader {
 								}
 
 								double dNum = Double.parseDouble(df.formatCellValue(cell));
-								String metricName = growthMetricNames.get(cell.getColumnIndex() - yieldBeginIndex);
-								
-															
+								String metricName = growthMetricNames.get(cell.getColumnIndex() - yieldBeginIndex);							
 								yYields.get(yYields.size()-1).createUpdateMetricValue(dNum, metricName);
 
 								previousRowYieldID = currentRowYieldID; // current yield ID
@@ -124,17 +121,14 @@ public class ExcelReader {
 
 								double dNum = Double.parseDouble(df.formatCellValue(cell));
 								String metricName = growthMetricNames.get(cell.getColumnIndex() - yieldBeginIndex);
-								
 								yYields.get(yYields.size()-1).createUpdateMetricValue(dNum, metricName);
-								
-								//System.out.println(previousRowYieldID + " " + growthMetricNames.get(cell.getColumnIndex() - yieldBeginIndex) + " " + cell.getColumnIndex() + " " + df.formatCellValue(cell));
-								
+
 							}
 						}
 					}		
 				} 		
 			} // close row iteration
-			
+
 			fis.close();
 			workbook.close();
 
@@ -145,11 +139,13 @@ public class ExcelReader {
 			e.printStackTrace();
 		}
 
+		//showing the number of age and growth metrics created per growth yield
 		for (GrowthYield s: yYields) {
 			s.printMetricNames();
 		}
 
 		System.out.println("There are: " + yYields.size() + " yields and should be 80");
+
 	}
 
 } // close class

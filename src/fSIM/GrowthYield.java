@@ -49,7 +49,6 @@ public class GrowthYield implements YieldAdapter {
 		System.out.println("There are " + growthMetrics.size() + " growth metric objects and " + yAges.size() + " age objects in " + this.getYieldIdentifier());
 	}
 	
-	
 	public String getYieldIdentifier() {
 		return species + productivity + thin;	
 	}

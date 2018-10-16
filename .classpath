@@ -25,5 +25,6 @@
 	<classpathentry kind="lib" path="G:/My Drive/UCD/fSIM/fSIM/lib/commons-compress-1.18-sources.jar"/>
 	<classpathentry kind="lib" path="G:/My Drive/UCD/fSIM/fSIM/lib/commons-compress-1.18-tests.jar"/>
 	<classpathentry kind="lib" path="G:/My Drive/UCD/fSIM/fSIM/lib/commons-compress-1.18-test-sources.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
