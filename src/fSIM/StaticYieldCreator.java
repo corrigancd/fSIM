@@ -15,19 +15,27 @@ import java.util.Iterator;
 import java.util.LinkedList;	
 
 
-public class ExcelReader {
+public class StaticYieldCreator implements java.io.Serializable {
+	
+
+	private static final long serialVersionUID = -6042340360639682918L;
+	
+	ArrayList<GrowthYield> yYields = new ArrayList<GrowthYield>(); // yYields created based on IDs
+	LinkedList<String> growthMetricNames = new LinkedList<String>(); // metric names for growth metric object creation
+	
 
 	public void staticYieldCreation(String path, int sheetNumber) {
 
-		ArrayList<GrowthYield> yYields = new ArrayList<GrowthYield>(); // yYields created based on IDs
-		LinkedList<String> growthMetricNames = new LinkedList<String>(); // metric names for growth metric object creation
+	
+		
 		int yieldBeginIndex = 19; // add into method argument when this becomes the case
 		int ageColumnIndex = 18;
 
 		// public void staticYieldCreation(String path) {
 		int count = 0;
 		FileInputStream fis = null;
-
+		
+		
 		try {
 
 			fis = new FileInputStream(path);
@@ -97,6 +105,9 @@ public class ExcelReader {
 
 						//if previous and current ids don't match, create a new growth yield
 						if ((cell.getColumnIndex() >= yieldBeginIndex)) {
+							
+							
+							
 							if (!previousRowYieldID.equals(currentRowYieldID)) { //ids are not equal, create a new growth yield
 
 								yYields.add(new GrowthYield(species, productivity, thinStatus)); //creating a new growth yield object
@@ -108,7 +119,7 @@ public class ExcelReader {
 
 								double dNum = Double.parseDouble(df.formatCellValue(cell));
 								String metricName = growthMetricNames.get(cell.getColumnIndex() - yieldBeginIndex);							
-								yYields.get(yYields.size()-1).createUpdateMetricValue(dNum, metricName);
+								yYields.get(yYields.size()-1).createAddMetricValue(dNum, metricName);
 
 								previousRowYieldID = currentRowYieldID; // current yield ID
 
@@ -121,7 +132,7 @@ public class ExcelReader {
 
 								double dNum = Double.parseDouble(df.formatCellValue(cell));
 								String metricName = growthMetricNames.get(cell.getColumnIndex() - yieldBeginIndex);
-								yYields.get(yYields.size()-1).createUpdateMetricValue(dNum, metricName);
+								yYields.get(yYields.size()-1).createAddMetricValue(dNum, metricName);
 
 							}
 						}
@@ -141,11 +152,30 @@ public class ExcelReader {
 
 		//showing the number of age and growth metrics created per growth yield
 		for (GrowthYield s: yYields) {
-			s.printMetricNames();
+			System.out.println("Linearly interpolating the ages now, this may take a few moments");
+			System.out.println(s.getYieldIdentifier());
+			s.yieldLinearInterpolation();
+			//s.printMetricNames();
 		}
 
 		System.out.println("There are: " + yYields.size() + " yields and should be 80");
 
 	}
 
+	public ArrayList<GrowthYield> getFCYields() {
+		return yYields;
+	}	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 } // close class

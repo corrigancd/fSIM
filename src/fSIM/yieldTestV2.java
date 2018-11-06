@@ -1,24 +1,25 @@
 package fSIM;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
+public class yieldTestV2 {
 
-
-public class yieldTest {
-
-	@Before
-	static void setUpBeforeClass() {
+	
+	Areas a;
+	ArrayList<GrowthYield> yYields;
+	static GrowthYield gY;
+	
+	@BeforeClass
+	public static void setUpBeforeClass() throws Exception {
 		//array list of all yields, likely to go into a 'Matching' class eventually
 		ArrayList<GrowthYield> yYields = new ArrayList<GrowthYield>();
 		
-		GrowthYield gY = new GrowthYield("SS", "16", "thin"); //add if statement here when reading rows from table to only create a new growth yield object if it hasn't been invented yet
+		gY = new GrowthYield("SS", "16", "thin"); //add if statement here when reading rows from table to only create a new growth yield object if it hasn't been invented yet
 		yYields.add(gY);
 		
 		//creating dummy yield data for ss yc 16
@@ -40,10 +41,10 @@ public class yieldTest {
 
 
 
-		gY.createGrowthMetric("yCFVol");
+		gY.createAddMetricValue(0, "yCFVol");
 
 		//creating dummy yield data for ss yc 16
-		gY.createAddMetricValue( 	0, "yCFVol"	);
+		//gY.createUpdateMetricValue( 	0, "yCFVol"	);
 		gY.createAddMetricValue( 	30.88235294, "yCFVol"	);
 		gY.createAddMetricValue( 	75, "yCFVol");
 		gY.createAddMetricValue( 	156, "yCFVol");
@@ -81,31 +82,44 @@ public class yieldTest {
 		a.addStand(s3);
 		a.addStand(new Stand("SS",24,2, 20));
 		
-		gY.getMetric(17,"yCFVol");
-		
-	}
 	
+		//gY.yieldLinearInterpolation();
+	
+	}
+
 	@Test
-	public void checkAnyVolume() {
-		Assert.assertEquals(75, gY.getMetric(17,"yCFVol"));
+	public void checkUnInterpolatedVolume() {
+		Assert.assertEquals(gY.getMetric(17,"yCFVol"), 75, 0.5);
 	}
-	
+	@Test
+	public void checkUnInterpolatedAgeCount() {
+		Assert.assertEquals(gY.getUnInAges().size(), 15, 0.5);
+	}
+	@Test
+	public void checkUnInterpolatedGmCount() {
+		Assert.assertEquals(gY.getUnInGrowthMetrics().size(), 1, 0.5);
+	}
+	@Test
+	public void checkInterpolatedAge() {
+		Assert.assertEquals(gY.getInterpolatedAges()[4].getAge(), 5, 0.5);
+	}
+	@Test
+	public void checkInterpolatedAgeCount() {
+		Assert.assertEquals(gY.getInterpolatedAges().length, 78, 0.5);	
+	}
 
-//	@Test
-//	void matchingTest () { //print out all stands /// this will likely go into a class called 'Matching' eventually
-//		for (Stand stand : a.getAllStands()) {
-//			
-//			for (GrowthYield gYield: yYields) {
-//				//System.out.print("yieldID: " + yield.getYieldIdentifier() + " standID: " + stand.getStandIdentifier() +"\n");
-//				if (stand.getStandIdentifier().equals(gYield.getYieldIdentifier())) {
-//					System.out.println("A " + stand.getSpecies() + " stand at YC " + stand.getProductivity() + 
-//							" produces " + gYield.getMetric(stand.getAge(),"yCFVol") + "m^3 /ha and " + 
-//							stand.calcTotStand(gYield.getMetric(stand.getAge(),"yCFVol")) + " for the entire stand.");		
-//				}
-//			}
-//		}
-//	}
 	
-
 
 }
+
+
+
+
+
+	
+
+	
+
+
+	
+

@@ -19,7 +19,6 @@ public class Areas {
 	}
 
 	public  ArrayList<Stand> getAllStands() {
-		// TODO Auto-generated method stub
 		return allStands;
 	}
 
