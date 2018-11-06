@@ -90,6 +90,17 @@ public class GrowthYield implements java.io.Serializable {
 	public GrowthMetric[] getlInterpolatedGrowthMetrics() {
 		return lInterpolatedGrowthMetrics;
 	}
+	
+	public double getlInterpolatedGrowthMetric(String metricName, int age) {
+		double vol = 0;
+		System.out.println("The age is: " + age);
+		for (GrowthMetric g: growthMetrics) {
+			if (g.getName().equals(metricName)) {
+				vol = g.getInterpolatedMetricValue(age);
+			}
+		}
+		return vol;
+	}
 
 	public void yieldLinearInterpolation() {
 		linearlyInterpolateAges();
@@ -129,39 +140,38 @@ public class GrowthYield implements java.io.Serializable {
 						}
 					}
 				}
-								
-				int ageGap = 0; 
-				int ageGapIndex = 0; // the current age gap to divide the metric by to add onto the array
-				int nextGmAge = yAges.getFirst().getAge();
+					
+//				for (int i: growthAgeGaps) {
+//					System.out.println(i);
+//				}
 				
-								
 				
+			
+
 				//divide metric by the ageGap and add to the previous interpolated metric yield
-				for (GrowthMetric gM: growthMetrics) {
-//					gM.printMetricArray();		
+				for (GrowthMetric gM: growthMetrics) {			
+					
+					int ageGap = 0; 
+					int ageGapIndex = 0; // the current age gap to divide the metric by to add onto the array
+					int nextGmAge = yAges.getFirst().getAge();
+					
 					gM.setlInterpolatedMetricValues(ageMax+1); // set array of known length
-					//System.out.println("The array length to iterate is: " + gM.getlInterpolatedMetricArray().length);
+					
 					
 					for (int i = 0; i < gM.getlInterpolatedMetricArray().length; i ++) {
-						//System.out.println(ageGapIndex + "here2");
-							//System.out.println(gM.getName()+ " " + ageGap + " " + i + " " + ageGapIndex + " "+growthAgeGaps[ageGapIndex] + " " + yAges.get(0).getAge() + " "+ gM.getMetricValue(0));	
+						System.out.println(gM.getName() + " " + nextGmAge + " " + i);
 						if (i == nextGmAge) { // the first GM age is always equal 0 (in the dataset)
-							System.out.println(ageGapIndex + " next gmAge: " + nextGmAge+  "here3" + gM.getMetricValue(28));
-							gM.setInterpolatedMetricValue(i, gM.getMetricValue(ageGapIndex)); //new GrowthMetric(gM.getName());
-								
 							
-							//System.out.println("The already present metric value is: "  + gM.getMetricValue(ageGapIndex));
+							gM.setInterpolatedMetricValue(i, gM.getMetricValue(ageGapIndex)); 
 							
-							int currentGmAge = nextGmAge;
-							
-							System.out.println(growthAgeGaps.length);
-							
-							
-							nextGmAge = nextGmAge + growthAgeGaps[ageGapIndex];
-							
-							
-							ageGap = nextGmAge - currentGmAge;
-							ageGapIndex += 1;					
+							System.out.println("The uninterpolated inputted into metric is: " + gM.getMetricValue(ageGapIndex));
+											
+						 if (yAges.getLast().getAge() > nextGmAge) { //only iterate indexing variables if there is another index to move to, this avoids index out of bounds issues
+								int currentGmAge = nextGmAge;
+								ageGapIndex += 1;
+								nextGmAge = nextGmAge + growthAgeGaps[ageGapIndex];
+								ageGap = nextGmAge - currentGmAge;		
+							}
 					
 						} else {
 															//younger value to add to
@@ -172,28 +182,12 @@ public class GrowthYield implements java.io.Serializable {
 							
 							gM.setInterpolatedMetricValue(i, annualMetricValue);
 							
-							//System.out.println("The interpolated yield is: "  + gM.getInterpolatedMetricValue(i));
+							System.out.println("The interpolated yield is: "  + gM.getInterpolatedMetricValue(i));
 													
 						}						
 					}										
 				}			
-			}				
-
-
-
-
-		//	private GrowthMetric[] lineralyInterpolateGrowthMetrics(LinkedList<GrowthMetric> growthMetrics) {
-		//		//the last index in the  array list is always the oldest
-		//		int ageMax = getMaxAge(ages);
-		//		
-		//		//The yield length is now known and arrays are used for storage efficiency
-		//		GrowthMetric[] lInterpolatedAges = new GrowthMetric[ageMax];
-		//		
-		//		
-		//
-		//	}
-
-				
+			}								
 				
 	public LinkedList<GrowthAge> getUnInAges() {
 		return yAges;

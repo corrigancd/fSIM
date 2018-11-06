@@ -83,7 +83,7 @@ public class yieldTestV2 {
 		a.addStand(new Stand("SS",24,2, 20));
 		
 	
-		//gY.yieldLinearInterpolation();
+		gY.yieldLinearInterpolation();
 	
 	}
 
@@ -108,8 +108,17 @@ public class yieldTestV2 {
 		Assert.assertEquals(gY.getInterpolatedAges().length, 78, 0.5);	
 	}
 
-	
+	@Test
+	public void checkInterpolatedVolumeYoung() {
+		Assert.assertEquals(26.47, gY.getlInterpolatedGrowthMetric("yCFVol", 6), 0.2);	
+	}
 
+	
+	@Test
+	public void checkInterpolatedVolumeOld() {
+		Assert.assertEquals(601.5, gY.getlInterpolatedGrowthMetric("yCFVol", 75), 0.5);	
+	}
+	
 }
 
 
