@@ -45,20 +45,20 @@ public class yieldTestV2 {
 
 		//creating dummy yield data for ss yc 16
 		//gY.createUpdateMetricValue( 	0, "yCFVol"	);
-		gY.createAddMetricValue( 	30.88235294, "yCFVol"	);
-		gY.createAddMetricValue( 	75, "yCFVol");
-		gY.createAddMetricValue( 	156, "yCFVol");
-		gY.createAddMetricValue( 	206, "yCFVol");
-		gY.createAddMetricValue(     270, "yCFVol");
-		gY.createAddMetricValue( 	336, "yCFVol"	);
-		gY.createAddMetricValue( 	395, "yCFVol"	);
-		gY.createAddMetricValue( 	443, "yCFVol"	);
-		gY.createAddMetricValue( 	478, "yCFVol"	);
-		gY.createAddMetricValue( 	512, "yCFVol"	);
-		gY.createAddMetricValue( 	543, "yCFVol"	);
-		gY.createAddMetricValue( 	569, "yCFVol"	);
-		gY.createAddMetricValue( 	590, "yCFVol"	);
-		gY.createAddMetricValue( 	609, "yCFVol"	);
+		gY.createAddMetricValue(30.88235294, "yCFVol");
+		gY.createAddMetricValue(75, "yCFVol");
+		gY.createAddMetricValue(156, "yCFVol");
+		gY.createAddMetricValue(206, "yCFVol");
+		gY.createAddMetricValue(270, "yCFVol");
+		gY.createAddMetricValue(336, "yCFVol");
+		gY.createAddMetricValue(395, "yCFVol");
+		gY.createAddMetricValue(443, "yCFVol");
+		gY.createAddMetricValue(478, "yCFVol");
+		gY.createAddMetricValue(512, "yCFVol");
+		gY.createAddMetricValue(543, "yCFVol");
+		gY.createAddMetricValue(569, "yCFVol");
+		gY.createAddMetricValue(590, "yCFVol");
+		gY.createAddMetricValue(609, "yCFVol");
 	
 
 		
@@ -82,37 +82,32 @@ public class yieldTestV2 {
 		a.addStand(s3);
 		a.addStand(new Stand("SS",24,2, 20));
 		
-	
 		gY.yieldLinearInterpolation();
-	
 	}
 
-	@Test
-	public void checkUnInterpolatedVolume() {
-		Assert.assertEquals(gY.getMetric(17,"yCFVol"), 75, 0.5);
-	}
-	@Test
-	public void checkUnInterpolatedAgeCount() {
-		Assert.assertEquals(gY.getUnInAges().size(), 15, 0.5);
-	}
-	@Test
-	public void checkUnInterpolatedGmCount() {
-		Assert.assertEquals(gY.getUnInGrowthMetrics().size(), 1, 0.5);
-	}
-	@Test
-	public void checkInterpolatedAge() {
-		Assert.assertEquals(gY.getInterpolatedAges()[4].getAge(), 5, 0.5);
-	}
-	@Test
-	public void checkInterpolatedAgeCount() {
-		Assert.assertEquals(gY.getInterpolatedAges().length, 78, 0.5);	
-	}
+
+//	@Test
+//	public void checkUnInterpolatedAgeCount() {
+//		Assert.assertEquals(gY.getUnInAges().size(), 15, 0.5);
+//	}
+//	@Test
+//	public void checkUnInterpolatedGmCount() {
+//		Assert.assertEquals(gY.getUnInGrowthMetrics().size(), 1, 0.5);
+//	}
+	
+//	@Test
+//	public void checkInterpolatedAge() {
+//		Assert.assertEquals(gY.getInterpolatedAges()[4].getAge(), 5, 0.5);
+//	}
+//	@Test
+//	public void checkInterpolatedAgeCount() {
+//		Assert.assertEquals(gY.getInterpolatedAges().length, 78, 0.5);	
+//	}
 
 	@Test
 	public void checkInterpolatedVolumeYoung() {
 		Assert.assertEquals(26.47, gY.getlInterpolatedGrowthMetric("yCFVol", 6), 0.2);	
 	}
-
 	
 	@Test
 	public void checkInterpolatedVolumeOld() {

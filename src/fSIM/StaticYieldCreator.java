@@ -155,7 +155,6 @@ public class StaticYieldCreator implements java.io.Serializable {
 			System.out.println("Linearly interpolating the ages now, this may take a few moments");
 			System.out.println(s.getYieldIdentifier());
 			s.yieldLinearInterpolation();
-			//s.printMetricNames();
 		}
 
 		System.out.println("There are: " + yYields.size() + " yields and should be 80");

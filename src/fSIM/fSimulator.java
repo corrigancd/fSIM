@@ -57,11 +57,13 @@ public class fSimulator {
 
 		
 		
+			
+//		
 //			System.out.println("The unique yield identifiers currently loaded are: ");
-//					for (GrowthYield gY: eR.getFCYields()) {
+//					for (GrowthYield gY: eR. ) {
 //						
 //					}
-//				
+				
 
 	}
 

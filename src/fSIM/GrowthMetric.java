@@ -38,9 +38,9 @@ public class GrowthMetric implements java.io.Serializable {
 	public void setInterpolatedMetricValue(int i, double metric) {
 		lInterpolatedMetricValues[i] = metric;
 	}
-	public double getInterpolatedMetricValue(int i) {
+	public double getInterpolatedMetricValue(int age) {
 		// TODO Auto-generated method stub
-		return lInterpolatedMetricValues[i];
+		return lInterpolatedMetricValues[age];
 	}
 	
 	public void printMetricArray() {

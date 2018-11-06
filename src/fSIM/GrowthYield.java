@@ -3,23 +3,26 @@ package fSIM;
 import java.util.Collections;
 import java.util.LinkedList;
 
+import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
+
 public class GrowthYield implements java.io.Serializable {
 
 
 	private static final long serialVersionUID = 5170141421229647397L;
 	private String species, productivity, thin;
 
+	//temp lists for use in linear interpolation
 	private LinkedList<GrowthAge> yAges = new LinkedList<GrowthAge>();
-	private LinkedList<GrowthMetric> growthMetrics = new LinkedList<GrowthMetric>();
-	
-	
-	
-	private GrowthAge[] lInterpolatedAges;
 	private int[] growthAgeGaps;
-	private GrowthMetric[] lInterpolatedGrowthMetrics;
 	
 	
+
+	//permanently stored as linearly interpolated yields
+	private LinkedList<GrowthMetric> growthMetrics = new LinkedList<GrowthMetric>();
+	private GrowthAge[] lInterpolatedAges;
 	
+	//private GrowthMetric[] lInterpolatedGrowthMetrics;
+
 	public GrowthYield(String s, String p, String thin) {
 		this.species = s;
 		this.productivity = p;
@@ -30,30 +33,20 @@ public class GrowthYield implements java.io.Serializable {
 		yAges.add(gA);	
 	}
 
-	//new growth metric object created based on name
-	//public void createGrowthMetric(String name) {
-	//	this.growthMetrics.add(new GrowthMetric(name)); 
-	//}
-
 	//adding metric value to growth metric based on metric name
 	public void createAddMetricValue(double d, String gM) {
-
 		boolean createdAlready = false;
-
 		for (GrowthMetric g: growthMetrics) {
 			if (g.getName().equals(gM)) { // adding growth metric to object if one has been created
 				g.addMetricValue(d);
 				createdAlready = true;
 				break;
-			}
-			
-			
+			}	
 		}
 
 		if (createdAlready == false) {	//if after the iteration of all metric names, the variable remains false the created a new growthmetric
 			this.growthMetrics.add(new GrowthMetric(gM,d));  // create growth Metric object if one hasn't been created 
-		}
-		
+		}	
 	}
 
 
@@ -66,7 +59,9 @@ public class GrowthYield implements java.io.Serializable {
 		return species + productivity + thin;	
 	}
 
-	//retrieving metric from array of the corresponding yield age index to stand age 
+	
+	
+	//retrieving metric from array of the corresponding yield age index to stand age //THIS IS OUTDATED AS IT IS NOW POSSIBLE TO INDEX THE INTERPOLATED ARRAYS DIRECTLY 
 	public double getMetric(int standAge, String metricName) { 
 		double vol = 0;	
 		for (int i = 0; i< yAges.size(); i++) {			
@@ -86,44 +81,39 @@ public class GrowthYield implements java.io.Serializable {
 	public GrowthAge[] getlInterpolatedAges() {
 		return lInterpolatedAges;
 	}
-
-	public GrowthMetric[] getlInterpolatedGrowthMetrics() {
-		return lInterpolatedGrowthMetrics;
-	}
 	
 	public double getlInterpolatedGrowthMetric(String metricName, int age) {
 		double vol = 0;
 		System.out.println("The age is: " + age);
-		for (GrowthMetric g: growthMetrics) {
-			if (g.getName().equals(metricName)) {
-				vol = g.getInterpolatedMetricValue(age);
+		
+		for (GrowthMetric gM: growthMetrics) { 
+			if (gM.getName().equals(metricName)) {
+				vol = gM.getInterpolatedMetricValue(age);
+				
 			}
 		}
 		return vol;
 	}
 
 	public void yieldLinearInterpolation() {
-		linearlyInterpolateAges();
+		
+		linearlyInterpolate();
+		
+		//nulling the temp values for storage
+		yAges = null;
+		growthAgeGaps = null;
 	}
 
-
-	
-
-
-	private void linearlyInterpolateAges() {		
+	private void linearlyInterpolate() {		
 		//the last index in the ages array list is always the oldest
 		int ageMax = yAges.get(yAges.size()-1).getAge();
 		int mostRecentAge = 0;
 		//The yield length is now known and arrays are used for storage efficiency as is the number of gaps required for linear interpolation
-		lInterpolatedAges = new GrowthAge[ageMax+1];
-		lInterpolatedGrowthMetrics = new GrowthMetric[ageMax+1];
-		
-		
 		
 		growthAgeGaps = new int[yAges.size()];
 		//System.out.println("the length is: " + growthAgeGaps.length);
 		
-				for (int i = 0; i < lInterpolatedAges.length; i ++) {
+				for (int i = 0; i < (ageMax+1); i ++) {
 					mostRecentAge = 0;
 					int ageGapIndex = 0;
 					for (GrowthAge gA: yAges) {
@@ -132,22 +122,9 @@ public class GrowthYield implements java.io.Serializable {
 						growthAgeGaps[ageGapIndex] = gA.getAge() - mostRecentAge;
 						mostRecentAge = gA.getAge();
 						ageGapIndex += 1;
-						
-						if (gA.getAge() == i+1) {
-							lInterpolatedAges[i] = gA;
-						} else {
-							lInterpolatedAges[i] = new GrowthAge(i+1);
-						}
 					}
 				}
 					
-//				for (int i: growthAgeGaps) {
-//					System.out.println(i);
-//				}
-				
-				
-			
-
 				//divide metric by the ageGap and add to the previous interpolated metric yield
 				for (GrowthMetric gM: growthMetrics) {			
 					
@@ -157,51 +134,29 @@ public class GrowthYield implements java.io.Serializable {
 					
 					gM.setlInterpolatedMetricValues(ageMax+1); // set array of known length
 					
-					
 					for (int i = 0; i < gM.getlInterpolatedMetricArray().length; i ++) {
 						System.out.println(gM.getName() + " " + nextGmAge + " " + i);
 						if (i == nextGmAge) { // the first GM age is always equal 0 (in the dataset)
 							
 							gM.setInterpolatedMetricValue(i, gM.getMetricValue(ageGapIndex)); 
-							
-							System.out.println("The uninterpolated inputted into metric is: " + gM.getMetricValue(ageGapIndex));
-											
+																		
 						 if (yAges.getLast().getAge() > nextGmAge) { //only iterate indexing variables if there is another index to move to, this avoids index out of bounds issues
-								int currentGmAge = nextGmAge;
-								ageGapIndex += 1;
-								nextGmAge = nextGmAge + growthAgeGaps[ageGapIndex];
-								ageGap = nextGmAge - currentGmAge;		
+							int currentGmAge = nextGmAge;
+							ageGapIndex += 1;
+							nextGmAge = nextGmAge + growthAgeGaps[ageGapIndex];
+							ageGap = nextGmAge - currentGmAge;		
 							}
-					
+						 
 						} else {
-															//younger value to add to
+							 // interpolated metric 	//younger value to add to
 							double annualMetricValue = (gM.getMetricValue(ageGapIndex-1) + 
 							// this is the annual yield: 				older value						younger value				the gap between values	
 															((gM.getMetricValue(ageGapIndex) - gM.getMetricValue(ageGapIndex-1)) / growthAgeGaps[ageGapIndex]) * 
-																(i - (nextGmAge-ageGap))); /// growthAgeGaps[ageGapIndex];
+																(i - (nextGmAge-ageGap))); 
 							
-							gM.setInterpolatedMetricValue(i, annualMetricValue);
-							
-							System.out.println("The interpolated yield is: "  + gM.getInterpolatedMetricValue(i));
-													
+							gM.setInterpolatedMetricValue(i, annualMetricValue);													
 						}						
 					}										
-				}			
+				}
 			}								
-				
-	public LinkedList<GrowthAge> getUnInAges() {
-		return yAges;
-	}
-	public LinkedList<GrowthMetric> getUnInGrowthMetrics() {
-		return growthMetrics;
-	}
-
-	public GrowthAge[] getInterpolatedAges() {
-		return lInterpolatedAges;
-	}
-
-	public GrowthMetric[] getInterpolatedGrowthMetrics() {
-	    return lInterpolatedGrowthMetrics;	
-	}
-	
 }
